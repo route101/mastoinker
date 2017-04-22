@@ -1,0 +1,48 @@
+{
+  "manifest_version": 2,
+  "name": "MastOinker",
+  "version": "1.0.0",
+  
+  "description": "Quick image view assistant for Mastodon client",
+  
+  "icons": {
+    "16": "res/icon16.png",
+    "48": "res/icon48.png",
+    "128": "res/icon128.png"
+  },
+  
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "downloads",
+    "webRequest",
+    "contextMenus",
+    "storage",
+    "notifications",
+    "alarms",
+    "webRequestBlocking",
+    "webNavigation",
+    "<all_urls>"
+  ],
+  
+  "web_accessible_resources": [
+  
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [ 
+        "http://*/web/timelines/*", 
+        "https://*/web/timelines/*", 
+        "http://*/web/accounts/*",
+        "https://*/web/accounts/*" 
+      ],
+      "js": [
+        "src/mastoinker.js",
+        "src/topframe.js"
+      ],
+      "all_frames": false,
+      "run_at": "document_end"
+    }
+  ]
+}
