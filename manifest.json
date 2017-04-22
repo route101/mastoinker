@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "MastOinker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   
   "description": "Quick image view assistant for Mastodon client",
   
@@ -32,10 +32,8 @@
   "content_scripts": [
     {
       "matches": [ 
-        "http://*/web/timelines/*", 
-        "https://*/web/timelines/*", 
-        "http://*/web/accounts/*",
-        "https://*/web/accounts/*" 
+        "http://*/web/*", 
+        "https://*/web/*"
       ],
       "js": [
         "src/mastoinker.js",
