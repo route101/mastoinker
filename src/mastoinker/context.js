@@ -13,12 +13,14 @@ AppContext.prototype.initialize = function (callback) {
 };
 
 // TODO: need config-manager thing
-AppContext.prototype.getConfig = function (key) {
-	return this.configStorage.get(key);
+AppContext.prototype.getConfig = function (key, defaultValue) {
+	var value = this.configStorage.get(key);
+	if (value === undefined) value = defaultValue;
+	return value;
 };
 
-AppContext.prototype.putConfig = function (key, value) {
-	this.configStorage.put(key, value);
+AppContext.prototype.putConfig = function (key, value, callback) {
+	this.configStorage.put(key, value, callback);
 };
 
 this.AppContext = AppContext;

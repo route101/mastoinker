@@ -53,7 +53,7 @@ function ImageViewColumnControl(container, context) {
 	};
 	
 	// defaults true
-	var shouldDisplayNSFW = context.getConfig('nsfw') || true;
+	var shouldDisplayNSFW = context.getConfig('nsfw', true);
 	
 	this.nsfwControlItem = new ControlItem('nsfw', "Display NSFW images", shouldDisplayNSFW);
 	this.nsfwControlItem.delegate = new ItemDelegate();

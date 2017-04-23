@@ -14,7 +14,7 @@ Mastoinker.prototype.init = function () {
 	if (columnsArea == null) return;
 	
 	var imageView = new ImageViewColumn(columnsArea, this.context);
-	this.timelineObserver = new TimelineObserver(columnsArea, imageView.insert.bind(imageView));
+	this.timelineObserver = new TimelineObserver(columnsArea, imageView.insert.bind(imageView), this.context);
 	this.timelineObserver.start();
 	
 	this.imageViewColumn = imageView;

@@ -11,3 +11,4 @@ ctx.initialize(function (ctx) {
 
 }).call(this);
 
+// TODO: avoid namespace pollution
