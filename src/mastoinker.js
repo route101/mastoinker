@@ -40,7 +40,20 @@ TimelineObserver.prototype.stop = function () {
 };
 
 TimelineObserver.prototype.handle = function (node) {
-	if (!node.classList || !node.classList.contains('status')) return;
+	if (node.classList && node.classList.contains('status')) {
+		this.handleStatus(node);
+	}
+	else {
+		for (var child of node.children) {
+			if (child.classList && child.classList.contains('status')) {
+				/* boosted */
+				this.handleStatus(child);
+			}
+		}
+	}
+};
+
+TimelineObserver.prototype.handleStatus = function (node) {
 	var name = ""
 	var displayNameHTML = ""
 	var displayNameText = ""
@@ -53,7 +66,6 @@ TimelineObserver.prototype.handle = function (node) {
 		displayNameHTML = displayNameElem.innerHTML;
 		displayNameText = displayNameElem.innerText;
 	}
-	console.log(node);
 	var mediaSpoiler = node.querySelector('.media-spoiler');
 	if (mediaSpoiler) {
 		mediaSpoiler.click();
