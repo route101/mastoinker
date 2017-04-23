@@ -1,6 +1,25 @@
 
 (function () { 'use strict';	
 
+
+function CssRuleInjector() {
+
+}
+
+CssRuleInjector.prototype.inject = function (selector, rule) {
+	if (document.styleSheets == null) return;
+	if (document.head == null) return;
+	var style = document.createElement('style');
+	style.appendChild(document.createTextNode(''));
+	document.head.appendChild(style);
+	style.sheet.insertRule(selector + ' {' + rule + '}', style.sheet.cssRules.length);
+};
+
+CssRuleInjector.prototype.injectColumnCollapseRule = function () {
+	this.inject('.columns-area > div:nth-child(2):nth-last-child(1)', 'display: none !important;');
+}
+
+
 function TimelineItem(name, nameElem, displayNameHTML, displayNameText, imageAnchors) {
 	this.name = name;
 	this.nameElement = nameElem;
@@ -159,10 +178,13 @@ ImageViewColumn.prototype.insert = function (timelineItem) {
 function Mastoinker() {
 	this.timelineObserver = null;
 	this.imageViewColumn = null;
+	this.cssRuleInjector = null;
 }
 
 Mastoinker.prototype.init = function () {
 	var instance = this;
+	if (!this.confirm()) return;
+	
 	var columnsArea = document.querySelector('.columns-area');
 	if (columnsArea == null) return;
 	
@@ -172,6 +194,9 @@ Mastoinker.prototype.init = function () {
 	
 	this.imageViewColumn = imageView;
 	this.imageViewColumn.inject();
+	
+	this.cssRuleInjector = new CssRuleInjector();
+	this.cssRuleInjector.injectColumnCollapseRule();
 };
 
 Mastoinker.prototype.deinit = function () {
@@ -179,6 +204,12 @@ Mastoinker.prototype.deinit = function () {
 		this.timelineObserver.stop();
 		this.timelineObserver = null;
 	}
+};
+
+Mastoinker.prototype.confirm = function () {
+	var reactAppHolder = document.querySelector('body.app-body > .app-holder');
+	if (reactAppHolder == null) return false;
+	return reactAppHolder.dataset.reactClass === 'Mastodon';
 };
 
 this.Mastoinker = Mastoinker;
