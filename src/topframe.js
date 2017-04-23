@@ -4,4 +4,6 @@
 var oinker = new Mastoinker();
 oinker.init();
 
-}).call();
+this.mastoinker = oinker;
+
+}).call(this);

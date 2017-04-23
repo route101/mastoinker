@@ -1,9 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "MastOinker",
-  "version": "1.0.6",
+  "name": "__MSG_extName__",
+  "version": "1.0.7",
   
-  "description": "Quick image view assistant for Mastodon client",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
   
   "icons": {
     "16": "res/icon16.png",
@@ -36,6 +37,9 @@
         "https://*/web/*"
       ],
       "js": [
+        "src/mastoinker/cssrule.js",
+        "src/mastoinker/column.js",
+        "src/mastoinker/timeline.js",
         "src/mastoinker.js",
         "src/topframe.js"
       ],
