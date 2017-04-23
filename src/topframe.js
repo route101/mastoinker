@@ -1,9 +1,13 @@
 
 (function () { 'use strict';  
 
-var oinker = new Mastoinker();
-oinker.init();
+if (!Mastoinker.underlyingMastodon()) return;
 
-this.mastoinker = oinker;
+var ctx = new AppContext();
+ctx.initialize(function (ctx) {
+	var oinker = new Mastoinker(ctx);
+	oinker.init();
+});
 
 }).call(this);
+

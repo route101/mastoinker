@@ -8,5 +8,4 @@ Upcoming:
 
 - use APIs instead of scraping HTML
 - rich user interface
-
-
+- remove image duplicates on timeline item insertion

@@ -44,9 +44,20 @@ ControlItem.prototype.changeValue = function(value) {
 	this.value = value;
 };
 
-function ImageViewColumnControl(container) {
+function ImageViewColumnControl(container, context) {
 	this.container = container;
-	this.nsfwControlItem = new ControlItem('nsfw', "Display NSFW images");
+	
+	function ItemDelegate() { }
+	ItemDelegate.prototype.changed = function (item, value) {
+		context.putConfig(item.id, value);
+	};
+	
+	// defaults true
+	var shouldDisplayNSFW = context.getConfig('nsfw') || true;
+	
+	this.nsfwControlItem = new ControlItem('nsfw', "Display NSFW images", shouldDisplayNSFW);
+	this.nsfwControlItem.delegate = new ItemDelegate();
+	
 	this.items = [this.nsfwControlItem];
 }
 
@@ -74,6 +85,21 @@ ImageViewColumnControl.prototype.inject = function () {
 	
 	this.insert(this.nsfwControlItem, settingsOuter);
 	
+	settingsButton.onclick = function () {
+		if (settingsButton.classList.contains('collapsable-collapsed')) {
+			settingsButton.classList.remove('collapsable-collapsed');
+			settingsButton.classList.add('collapsable');
+			settingsOverlay.style.height = settingsOuter.clientHeight + 'px';
+			settingsOverlay.style.opacity = '1';
+		}
+		else {
+			settingsButton.classList.remove('collapsable');
+			settingsButton.classList.add('collapsable-collapsed');
+			settingsOverlay.style.height = '0px';
+			settingsOverlay.style.opacity = '0';
+		}
+	};
+	
 	this.container.appendChild(control);
 };
 
@@ -85,7 +111,10 @@ ImageViewColumnControl.prototype.insert = function (item, container) {
 	settingsSection.appendChild(label);
 	
 	var toggleContainer = document.createElement('div');
-	toggleContainer.classList.add('react-toggle', 'react-toggle--checked');
+	toggleContainer.classList.add('react-toggle');
+	if (item.value) {
+		toggleContainer.classList.add('react-toggle--checked');
+	}
 	label.appendChild(toggleContainer);
 	
 	var toggleLabel = document.createElement('span');
@@ -119,7 +148,7 @@ ImageViewColumnControl.prototype.insert = function (item, container) {
 	};
 	toggleContainer.appendChild(toggleInput);
 	
-	//
+	/* // displaying svgs is a bit overkill
 	var toggleTrackCheck = document.createElement('div');
 	toggleTrackCheck.classList.add('react-toggle-track-check');
 	
@@ -158,6 +187,7 @@ ImageViewColumnControl.prototype.insert = function (item, container) {
 	svgX.appendChild(svgXPath);
 	toggleTrackX.appendChild(svgX);
 	toggleTrack.appendChild(toggleTrackX);
+	*/
 	
 	container.appendChild(settingsSection);
 };
@@ -166,6 +196,7 @@ ImageViewColumnControl.prototype.insert = function (item, container) {
 function ImageViewColumnContent(container) {
 	this.container = container;
 	this.element = null;
+	this.animationTimeline = new AnimationTimeline();
 }
 
 ImageViewColumnContent.prototype.inject = function () {
@@ -177,11 +208,20 @@ ImageViewColumnContent.prototype.inject = function () {
 
 ImageViewColumnContent.prototype.scrollTop = function () {
 	var element = this.element;	
-	element.scrollTop = 0;
+	var initial = element.scrollTop;
+	
+	var seq = new AnimationSequence(250);
+	function AnimationDelegate() { }
+	AnimationDelegate.prototype.updated = function (seq, progress, delta) {
+		element.scrollTop = seq.calculateEasingOut(initial, 0);
+	};
+	seq.delegate = new AnimationDelegate();
+	this.animationTimeline.add(seq);
 };
 
-function ImageViewColumn(container) {
+function ImageViewColumn(container, context) {
 	this.container = container;
+	this.context = context;
 	this.header = null;
 	this.control = null;
 	this.content = null;
@@ -193,7 +233,7 @@ ImageViewColumn.prototype.inject = function () {
 	column.classList.add('column');
 	
 	var header = new ImageViewColumnHeader(column);
-	var control = new ImageViewColumnControl(column);
+	var control = new ImageViewColumnControl(column, this.context);
 	var content = new ImageViewColumnContent(column);
 	
 	header.inject();
@@ -205,6 +245,12 @@ ImageViewColumn.prototype.inject = function () {
 		content.scrollTop();
 	};
 	header.delegate = new HeaderDelegate();
+	
+	function ControlDelegate() { }
+	ControlDelegate.prototype.changed = function (item, state) {
+		
+	};
+	control.delegate = new ControlDelegate();
 	
 	this.header = header;
 	this.control = control;
