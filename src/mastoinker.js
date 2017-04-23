@@ -43,12 +43,10 @@ TimelineObserver.prototype.handle = function (node) {
 	if (node.classList && node.classList.contains('status')) {
 		this.handleStatus(node);
 	}
-	else {
+	else if (node.children) {
 		for (var child of node.children) {
-			if (child.classList && child.classList.contains('status')) {
-				/* boosted */
-				this.handleStatus(child);
-			}
+			/* search boosted status recursively */
+			this.handle(child);
 		}
 	}
 };
