@@ -17,13 +17,12 @@ AppStorage.prototype.load = function (callback) {
 
 AppStorage.prototype.get = function (key) {
 	var value = this.section[key];
-	console.log('get', key, value);
+	//console.log('get', key, value);
 	return value;
 };
 
 AppStorage.prototype.put = function (key, value, callback) {
-	console.log('put', key, value);
-	
+	//console.log('put', key, value);
 	this.section[key] = value;
 	var dict = {};
 	dict[this.sectionKey] = this.section;

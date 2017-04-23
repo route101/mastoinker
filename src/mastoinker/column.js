@@ -49,7 +49,13 @@ function ImageViewColumnControl(container, context) {
 	
 	function ItemDelegate() { }
 	ItemDelegate.prototype.changed = function (item, value) {
-		context.putConfig(item.id, value);
+		context.putConfig(item.id, value, function () {
+			// HAX: NO MODAL PLZ
+			var confirmed = window.confirm('[MastOinker] Refresh the page to apply changes. \nAre you sure you want to reload the current page?');
+			if (confirmed) {
+				window.location.reload();
+			}
+		});
 	};
 	
 	// defaults true
