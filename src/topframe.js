@@ -5,8 +5,8 @@ if (!Mastoinker.underlyingMastodon()) return;
 
 var ctx = new AppContext();
 ctx.initialize(function (ctx) {
-	var oinker = new Mastoinker(ctx);
-	oinker.init();
+  var oinker = new Mastoinker(ctx);
+  oinker.init();
 });
 
 }).call(this);
