@@ -230,10 +230,16 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   if (timelineItem.imageAnchors.length === 0) return;
 
   var itemContainer = document.createElement('div');
-
-  var title = document.createElement('div');
+	var header = document.createElement('div');
+	header.style.marginLeft = '5px';
+	header.style.display = 'flex';
+	header.style.flexDirection = 'row';
+	header.style.alignItems = 'center';
+	header.style.justifyContent = 'space-between';
+	
+	var title = document.createElement('div');
   title.innerHTML = timelineItem.displayNameHTML;
-  title.style = 'max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13.5px;';
+  title.style = 'max-width: 70%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13.5px;';
   title.style.cursor = 'pointer';
   title.onmouseover = function () {
     this.style['text-decoration'] = 'underline';
@@ -245,9 +251,96 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     var a = timelineItem.nameElement;
     window.open(a.href);
   };
+  header.appendChild(title);
+	
+	// toobar
+	var toolbar = document.createElement('div');
+	toolbar.style = 'margin-top: 1px; margin-bottom: 1px; overflow: visible;';
+	
+	var favButtonDiv = document.createElement('div');
+	favButtonDiv.style = 'display: inline-block; margin-right: 3px;';
+	
+	var boostButtonDiv = document.createElement('div');
+	boostButtonDiv.style = 'display: inline-block; margin-right: 18px;';
 
-  itemContainer.appendChild(title);
+	var favButton = document.createElement('button');
+	favButton.classList.add('icon-button');
+	favButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+	
+	var boostButton = document.createElement('button');
+	boostButton.classList.add('icon-button');
+	boostButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
 
+	var favButtonIcon = document.createElement('i');
+	favButtonIcon.classList.add('fa', 'fa-fw', 'fa-star');
+	favButtonIcon.style.verticalAlign = 'middle';
+
+	var boostButtonIcon = document.createElement('i');
+	boostButtonIcon.classList.add('fa', 'fa-fw', 'fa-retweet');
+	boostButtonIcon.style.verticalAlign = 'middle';
+
+	boostButton.appendChild(boostButtonIcon);
+	favButton.appendChild(favButtonIcon);
+	boostButtonDiv.appendChild(boostButton);
+	favButtonDiv.appendChild(favButton);
+	toolbar.appendChild(boostButtonDiv);
+	toolbar.appendChild(favButtonDiv);
+	
+	header.appendChild(toolbar);
+	itemContainer.appendChild(header);
+
+	boostButton.onclick = function () {
+		var button = timelineItem.boostButton;
+		if (button) {
+			button.click();
+		}
+	};
+	favButton.onclick = function () {
+		var button = timelineItem.favouriteButton;
+		if (button) {
+			button.click();
+		}
+	};
+	
+	function updateButton(active, star) {
+		if (active) {
+			this.classList.add('active');
+			if (star) this.style.color = 'rgb(202, 143, 4)';
+		}
+		else {
+			this.classList.remove('active');
+			if (star) this.style.removeProperty('color');
+		}
+	}
+	
+	function observe(target, button, star) {
+		function callback(mutations) {
+			mutations.forEach(function (mutation) {
+				if (mutation.type !== 'attributes') return;
+				var active = target.classList.contains('active');
+				updateButton.call(button, active, star);
+			});
+		}
+		var observer = new MutationObserver(callback);
+		observer.observe(target, { attributes: true });
+		return observer;
+	}
+
+	if (timelineItem.boostButton) {
+		updateButton.call(boostButton, 
+			timelineItem.boostButton.classList.contains('active'), false);
+		var ob = observe(timelineItem.boostButton, boostButton, false);
+		itemContainer.$oinker$boost$observer = ob; // HAX
+	}
+
+	if (timelineItem.favouriteButton) {
+		updateButton.call(favButton, 
+			timelineItem.favouriteButton.classList.contains('active'), true);
+		var ob = observe(timelineItem.favouriteButton, favButton, true);
+		itemContainer.$oinker$fav$observer = ob; // HAX
+	}
+
+	// images
   var loader = new ImageLazyLoader();
 
   timelineItem.imageAnchors.forEach(function (imageAnchor) {
@@ -271,6 +364,14 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var ROTATION = 100;
   if (content.children.length > ROTATION) {
     var last = content.lastChild;
+		
+		if (last.$oinker$boost$observer) {
+			last.$oinker$boost$observer.disconnect();
+		}
+		if (last.$oinker$fav$observer) {
+			last.$oinker$fav$observer.disconnect();
+		}
+		
     content.removeChild(last);
   }
 };

@@ -10,6 +10,8 @@ function TimelineItem(node) {
   this.imageAnchors = null;
   this.hasMediaSpoiler = null;
   this.datetime = null;
+	this.boostButton = null;
+	this.favouriteButton = null;
 }
 
 function TimelineObserver(element, context) {
@@ -100,6 +102,8 @@ TimelineObserver.prototype.handleStatus = function (node) {
   item.imageAnchors = imageAnchors;
   item.hasMediaSpoiler = mediaSpoiler != null;
   item.datetime = datetime;
+	item.boostButton = node.querySelector('button[title="Boost"]');
+	item.favouriteButton = node.querySelector('button[title="Favourite"]');
 
   if (this.sink !== null) {
     this.sink(item);
