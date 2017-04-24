@@ -1,20 +1,22 @@
 
 (function () { 'use strict';	
 
-function TimelineItem(name, nameElem, displayNameHTML, displayNameText, imageAnchors, hasMediaSpoiler) {
-	this.name = name;
-	this.nameElement = nameElem;
-	this.displayNameHTML = displayNameHTML;
-	this.displayNameText = displayNameText;
-	this.imageAnchors = imageAnchors;
-	this.hasMediaSpoiler = hasMediaSpoiler;
+function TimelineItem(node) {
+	this.node = node; // preserve reference
+	this.name = null;
+	this.nameElement = null;
+	this.displayNameHTML = null;
+	this.displayNameText = null;
+	this.imageAnchors = null;
+	this.hasMediaSpoiler = null;
+	this.datetime = null;
 }
 
-function TimelineObserver(element, callback, context) {
+function TimelineObserver(element, context) {
 	this.element = element;
 	this.context = context;
 	this.observer = null;
-	this.callback = callback;
+	this.sink = null;
 }
 
 TimelineObserver.prototype.start = function () {
@@ -72,6 +74,15 @@ TimelineObserver.prototype.handleStatus = function (node) {
 	if (mediaSpoiler) {
 		mediaSpoiler.click();
 	}
+
+	var datetime = null;
+	var timeElem = node.querySelector('time');
+	if (timeElem) {
+		var datetimeStr = timeElem.getAttribute('datetime');
+		if (datetimeStr && datetimeStr != "") {
+			datetime = Date.parse(datetimeStr);
+		}
+	}
 	
 	var imageAnchors = [];
 	var anchors = node.querySelectorAll('a');
@@ -80,9 +91,18 @@ TimelineObserver.prototype.handleStatus = function (node) {
 			imageAnchors.push(item);
 		}
 	});
-	var item = new TimelineItem(name, nameElem, displayNameHTML, displayNameText, imageAnchors, mediaSpoiler != null);
-	if (this.callback) {
-		this.callback.call(null, item);
+	
+	var item = new TimelineItem(node);
+	item.name = name;
+	item.nameElement = nameElem;
+	item.displayNameHTML = displayNameHTML;
+	item.displayNameText = displayNameText;
+	item.imageAnchors = imageAnchors;
+	item.hasMediaSpoiler = mediaSpoiler != null;
+	item.datetime = datetime;
+
+	if (this.sink !== null) {
+		this.sink(item);
 	}
 };
 

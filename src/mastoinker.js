@@ -6,6 +6,7 @@ function Mastoinker(context) {
 	this.timelineObserver = null;
 	this.imageViewColumn = null;
 	this.cssRuleInjector = null;
+	this.loadDispatcher = null;
 }
 
 Mastoinker.prototype.init = function () {
@@ -14,7 +15,12 @@ Mastoinker.prototype.init = function () {
 	if (columnsArea == null) return;
 	
 	var imageView = new ImageViewColumn(columnsArea, this.context);
-	this.timelineObserver = new TimelineObserver(columnsArea, imageView.insert.bind(imageView), this.context);
+	
+	var dispatcher = new LoadDispatcher()
+	dispatcher.sink = imageView.insert.bind(imageView);
+	
+	this.timelineObserver = new TimelineObserver(columnsArea, this.context);
+	this.timelineObserver.sink = dispatcher.dispatch.bind(dispatcher);
 	this.timelineObserver.start();
 	
 	this.imageViewColumn = imageView;
@@ -23,6 +29,8 @@ Mastoinker.prototype.init = function () {
 	this.cssRuleInjector = new CssRuleInjector();
 	this.cssRuleInjector.injectColumnCollapseRule();
 	
+	this.loadDispatcher = dispatcher;
+
 	// HAX: ideal design: observer->processor
 	this.timelineObserver.handle(document.body);
 };

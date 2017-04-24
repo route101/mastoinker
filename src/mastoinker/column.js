@@ -152,48 +152,7 @@ ImageViewColumnControl.prototype.insert = function (item, container) {
 		}
 		item.changeValue(this.value === 'on');
 	};
-	toggleContainer.appendChild(toggleInput);
-	
-	/* // displaying svgs is a bit overkill
-	var toggleTrackCheck = document.createElement('div');
-	toggleTrackCheck.classList.add('react-toggle-track-check');
-	
-	var svgCheck = document.createElement('svg');
-	svgCheck.width = '14';
-	svgCheck.height = '11';
-	svgCheck.viewBox = '0 0 14 11';
-	var svgCheckTitle = document.createElement('title');
-	svgCheckTitle.innerText = 'switch-check';
-	svgCheck.appendChild(svgCheckTitle);
-	
-	var svgCheckPath = document.createElement('path');
-	svgCheckPath.setAttribute('d', 'M11.264 0L5.26 6.004 2.103 2.847 0 4.95l5.26 5.26 8.108-8.107L11.264 0');
-	svgCheckPath.setAttribute('fill', '#fff');
-	svgCheckPath.setAttribute('fill-rule', 'evenodd');
-	svgCheck.appendChild(svgCheckPath);
-	svgCheck.appendChild(svgCheckPath);
-	toggleTrackCheck.appendChild(svgCheck);
-	toggleTrack.appendChild(toggleTrackCheck);
-	
-	var toggleTrackX = document.createElement('div');
-	toggleTrackX.classList.add('react-toggle-track-x');
-	var svgX = document.createElement('svg');
-	svgX.width = '10';
-	svgX.height = '10';
-	svgX.viewBox = '0 0 10 10';
-	var svgXTitle = document.createElement('title');
-	svgXTitle.innerText = 'switch-x';
-	svgCheck.appendChild(svgXTitle);
-	
-	var svgXPath = document.createElement('path');
-	svgXPath.setAttribute('d', 'M9.9 2.12L7.78 0 4.95 2.828 2.12 0 0 2.12l2.83 2.83L0 7.776 2.123 9.9 4.95 7.07 7.78 9.9 9.9 7.776 7.072 4.95 9.9 2.12');
-	svgXPath.setAttribute('fill', '#fff');
-	svgXPath.setAttribute('fill-rule', 'evenodd');
-	svgX.appendChild(svgXPath);
-	svgX.appendChild(svgXPath);
-	toggleTrackX.appendChild(svgX);
-	toggleTrack.appendChild(toggleTrackX);
-	*/
+	toggleContainer.appendChild(toggleInput);	
 	
 	container.appendChild(settingsSection);
 };
@@ -264,9 +223,11 @@ ImageViewColumn.prototype.inject = function () {
 	this.container.appendChild(column);
 };
 
-ImageViewColumn.prototype.insert = function (timelineItem) {
+ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
 	var instance = this;
 	var content = instance.content.element;
+	
+	var timelineItem = proxy.item;
 	if (timelineItem.imageAnchors.length === 0) return;
 	
 	var itemContainer = document.createElement('div');
@@ -288,16 +249,24 @@ ImageViewColumn.prototype.insert = function (timelineItem) {
 	
 	itemContainer.appendChild(title);
 	
+	var loader = new ImageLazyLoader();
+	
 	timelineItem.imageAnchors.forEach(function (imageAnchor) {
 		var image = document.createElement('img');
-		image.src = imageAnchor.href;
 		image.style.width = '100%';
 		image.style.cursor = 'pointer';
 		image.onclick = function () {
 			imageAnchor.click();
 		};
+	
+		loader.register(image, imageAnchor.href);
 		itemContainer.appendChild(image);
 	});
+
+	proxy.sink = function (completionHandler) {
+		loader.sink = completionHandler;
+		loader.start();
+	};
 	
 	content.insertBefore(itemContainer, content.firstChild);
 	var ROTATION = 100;
