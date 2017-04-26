@@ -6,6 +6,7 @@ function Mastoinker(context) {
   this.timelineObserver = null;
   this.imageViewColumn = null;
   this.cssRuleInjector = null;
+  this.scriptInjector = null;
   this.loadDispatcher = null;
 }
 
@@ -18,9 +19,10 @@ Mastoinker.prototype.init = function () {
 
   var dispatcher = new LoadDispatcher()
   dispatcher.sink = imageView.insert.bind(imageView);
-
+  
   this.timelineObserver = new TimelineObserver(columnsArea, this.context);
   this.timelineObserver.sink = dispatcher.dispatch.bind(dispatcher);
+  this.timelineObserver.removedSink = imageView.remove.bind(imageView);
   this.timelineObserver.start();
 
   this.imageViewColumn = imageView;
@@ -28,7 +30,7 @@ Mastoinker.prototype.init = function () {
 
   this.cssRuleInjector = new CssRuleInjector();
   this.cssRuleInjector.injectColumnCollapseRule();
-
+  
   this.loadDispatcher = dispatcher;
 
   // HAX: ideal design: observer->processor
@@ -40,12 +42,6 @@ Mastoinker.prototype.deinit = function () {
     this.timelineObserver.stop();
     this.timelineObserver = null;
   }
-};
-
-Mastoinker.underlyingMastodon = function () {
-  var reactAppHolder = document.querySelector('body.app-body > .app-holder');
-  if (reactAppHolder == null) return false;
-  return reactAppHolder.dataset.reactClass === 'Mastodon';
 };
 
 this.Mastoinker = Mastoinker;

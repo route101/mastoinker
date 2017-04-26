@@ -1,7 +1,14 @@
 
 (function () { 'use strict';  
 
-if (!Mastoinker.underlyingMastodon()) return;
+function underlyingMastodon() {
+  var reactAppHolder = document.querySelector('body.app-body > .app-holder');
+  if (reactAppHolder == null) return false;
+  return reactAppHolder.dataset.reactClass === 'Mastodon';
+}
+
+if (!underlyingMastodon()) return;
+
 
 var ctx = new AppContext();
 ctx.initialize(function (ctx) {
@@ -9,6 +16,6 @@ ctx.initialize(function (ctx) {
   oinker.init();
 });
 
+
 }).call(this);
 
-// TODO: avoid namespace pollution

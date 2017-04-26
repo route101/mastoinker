@@ -32,6 +32,8 @@ AppStorage.prototype.put = function (key, value, callback) {
   });
 };
 
+
+
 this.AppStorage = AppStorage;
 
 }).call(this);

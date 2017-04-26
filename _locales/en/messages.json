@@ -4,5 +4,23 @@
   },
   "extDescription": {
     "message": "Quick image view assistant for Mastodon client"
+  },
+  "settingPreserve": {
+    "message": "Preserve statuses shown"
+  },
+  "settingNSFW": {
+    "message": "Display NSFW images"
+  },
+  "settingListBoost": {
+    "message": "List Boost statuses"
+  },
+  "settingListHome": {
+    "message": "List Home statuses"
+  },
+  "settingListUser": {
+    "message": "List User column statuses"
+  },
+  "descSettingPreserve": {
+    "message": "`Preserve statuses shown` option can be used to keep track of 100 images shown so far. But it also disables Boost and Favourite buttons."
   }
 }

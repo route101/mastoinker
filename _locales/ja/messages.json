@@ -4,5 +4,24 @@
   },
   "extDescription": {
     "message": "マストドンのタイムラインに流れる画像を見やすくします"
+  },
+  "settingPreserve": {
+    "message": "表示した画像を保持"
+  },
+  "settingNSFW": {
+    "message": "ＮＳＦＷ画像を表示"
+  },
+  "settingListBoost": {
+    "message": "ブーストされた画像を表示"
+  },
+  "settingListHome": {
+    "message": "ホームカラム上の画像を表示"
+  },
+  "settingListUser": {
+    "message": "ユーザカラム上の画像を表示"
+  },
+  "descSettingPreserve": {
+    "message": "「表示した画像を保持」オプションを有効にすると最近表示した１００件までの画像を保持できますが、ブースト・お気に入りボタンが使用不可になります"
   }
 }
+

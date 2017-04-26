@@ -3,6 +3,7 @@
 
 function TimelineItem(node) {
   this.node = node; // preserve reference
+  this.id = null;
   this.name = null;
   this.nameElement = null;
   this.displayNameHTML = null;
@@ -12,6 +13,11 @@ function TimelineItem(node) {
   this.datetime = null;
 	this.boostButton = null;
 	this.favouriteButton = null;
+  this.boosted = false;
+  this.onHomeColumn = false;
+  this.onUserColumn = false;
+  this.link = null;
+  this.numid = null;
 }
 
 function TimelineObserver(element, context) {
@@ -19,6 +25,7 @@ function TimelineObserver(element, context) {
   this.context = context;
   this.observer = null;
   this.sink = null;
+  this.removedSink = null;
 }
 
 TimelineObserver.prototype.start = function () {
@@ -27,10 +34,15 @@ TimelineObserver.prototype.start = function () {
     mutations.forEach(function(mutation) {
       if (mutation.type !== 'childList') return;
       var nodes = mutation.addedNodes;
-      if (nodes.length === 0) return;
       nodes.forEach(function (item) {
         if (!item) return;
         instance.handle(item);
+      });
+
+      var nodes = mutation.removedNodes;
+      nodes.forEach(function (item) {
+        if (!item) return;
+        instance.handleRemoval(item);
       });
     });
   });
@@ -71,6 +83,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
     displayNameText = displayNameElem.innerText;
   }
   var mediaSpoiler = node.querySelector('.media-spoiler');
+  // filter click and listing
   if (mediaSpoiler && !this.context.getConfig('nsfw', true)) return;
 
   if (mediaSpoiler) {
@@ -93,6 +106,12 @@ TimelineObserver.prototype.handleStatus = function (node) {
       imageAnchors.push(item);
     }
   });
+ 
+  var statusLink = node.querySelector('a.status__relative-time');
+  var boostButton = node.querySelector('button[title="Boost"]');
+  var favouriteButton = node.querySelector('button[title="Favourite"]');
+  
+  var pathname = statusLink.pathname;
 
   var item = new TimelineItem(node);
   item.name = name;
@@ -102,13 +121,68 @@ TimelineObserver.prototype.handleStatus = function (node) {
   item.imageAnchors = imageAnchors;
   item.hasMediaSpoiler = mediaSpoiler != null;
   item.datetime = datetime;
-	item.boostButton = node.querySelector('button[title="Boost"]');
-	item.favouriteButton = node.querySelector('button[title="Favourite"]');
+	item.boostButton = boostButton;
+	item.favouriteButton = favouriteButton;
+  item.id = pathname;
+  item.numid = pathname.substr(pathname.lastIndexOf('/') + 1);
+  item.link = statusLink.href;
+  
+  if (node.previousSibling) {
+    var sibling = node.previousSibling;
+    var boosted = sibling.classList.contains('status__prepend');
+    item.boosted = boosted;
+  }
+  
+  function searchColumnThatContainsNode(node) {
+    var node = node.parentNode;
+    var body = document.body;
+    while (node != null) {
+      if (node === body) return null;
+      if (node.classList && node.classList.contains('column')) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+  
+  var column = searchColumnThatContainsNode(node);
+  if (column) {
+    item.onHomeColumn = column.getAttribute('aria-label') === 'Home';
+    item.onUserColumn = column.querySelector('.scrollable > div > div > .account__header') != null;
+  }
+  
+  // filtering
+  if (!this.context.getConfig('listboost', true) && item.boosted) return;
+  if (!this.context.getConfig('listhome', true) && item.onHomeColumn) return;
+  if (!this.context.getConfig('listuser', true) && item.onUserColumn) return;
 
   if (this.sink !== null) {
     this.sink(item);
   }
 };
+
+
+TimelineObserver.prototype.handleRemoval = function (node) {
+  if (node.classList && node.classList.contains('status')) {
+    this.handleStatusRemoval(node);
+  }
+  else if (node.children) {
+    for (var child of node.children) {
+      /* search boosted status recursively */
+      this.handleRemoval(child);
+    }
+  }
+};
+
+TimelineObserver.prototype.handleStatusRemoval = function (node) {
+  var statusLink = node.querySelector('a.status__relative-time');
+  if (statusLink == null) return;
+  
+  var id = statusLink.pathname;
+  if (this.removedSink !== null) {
+    this.removedSink(id);
+  }
+};
+
 
 this.TimelineObserver = TimelineObserver;
 
