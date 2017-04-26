@@ -8,6 +8,7 @@ function ImageLazyLoader() {
   this.sink = null;
   this.timeoutDelay = 5000;
   this.timeoutID = null;
+  this.imageLoaded = null;
 }
 
 ImageLazyLoader.prototype.register = function (image, src) {
@@ -15,13 +16,18 @@ ImageLazyLoader.prototype.register = function (image, src) {
   this.srcs.push(src);
 };
 
-ImageLazyLoader.prototype.goNext = function () {
+ImageLazyLoader.prototype.goNext = function (e) {
   if (this.timeoutID !== null) {
     clearTimeout(this.timeoutID);
     this.timeoutID = null;
   }
 
   this.count += 1;
+
+  if (this.imageLoaded) {
+    this.imageLoaded(e.target);
+  }
+
   if (this.count === this.images.length) {
     this.sink();
   }

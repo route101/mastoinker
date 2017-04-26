@@ -1,7 +1,7 @@
 
 (function () { 'use strict';	
 
-	function ControlItem(id, name, value) {
+function ControlItem(id, name, value) {
   this.id = id;
   this.name = name;
   this.value = value;
@@ -35,16 +35,16 @@ function ImageViewColumnControl(container, context) {
   var shouldListHome = context.getConfig('listhome', true);
   var shouldListUser = context.getConfig('listuser', true);
   var shouldPreserve = context.getConfig('preserve', true);
-  
+
   var nsfw = new ControlItem('nsfw', chrome.i18n.getMessage('settingNSFW'), shouldDisplayNSFW);
   nsfw.delegate = new ItemDelegate();
-  
+
   var boost = new ControlItem('listboost', chrome.i18n.getMessage('settingListBoost'), shouldListBoost);
   boost.delegate = new ItemDelegate();
-  
+
   var home = new ControlItem('listhome', chrome.i18n.getMessage('settingListHome'), shouldListHome);
   home.delegate = new ItemDelegate();
-  
+
   var user = new ControlItem('listuser', chrome.i18n.getMessage('settingListUser'), shouldListUser);
   user.delegate = new ItemDelegate();
 
@@ -75,7 +75,7 @@ ImageViewColumnControl.prototype.inject = function () {
   settingsOuter.classList.add('column-settings--outer');
   settingsOuter.style = 'padding: 15px;';
   settingsOverlay.appendChild(settingsOuter);
-  
+
   for (var item of this.items) {
     this.insert(item, settingsOuter);
   }
@@ -86,7 +86,7 @@ ImageViewColumnControl.prototype.inject = function () {
   descSettingPreserve.style.color = '#9baec8';
   settingsOuter.appendChild(descSettingPreserve);
 
-  
+
   settingsButton.onclick = function () {
     if (settingsButton.classList.contains('collapsable-collapsed')) {
       settingsButton.classList.remove('collapsable-collapsed');

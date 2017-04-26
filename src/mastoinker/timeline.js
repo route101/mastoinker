@@ -1,6 +1,7 @@
 
 (function () { 'use strict';	
 
+
 function TimelineItem(node) {
   this.node = node; // preserve reference
   this.id = null;
@@ -11,13 +12,14 @@ function TimelineItem(node) {
   this.imageAnchors = null;
   this.hasMediaSpoiler = null;
   this.datetime = null;
-	this.boostButton = null;
-	this.favouriteButton = null;
+  this.boostButton = null;
+  this.favouriteButton = null;
   this.boosted = false;
   this.onHomeColumn = false;
   this.onUserColumn = false;
   this.link = null;
   this.numid = null;
+  this.videoContainer = null;
 }
 
 function TimelineObserver(element, context) {
@@ -106,11 +108,36 @@ TimelineObserver.prototype.handleStatus = function (node) {
       imageAnchors.push(item);
     }
   });
- 
-  var statusLink = node.querySelector('a.status__relative-time');
-  var boostButton = node.querySelector('button[title="Boost"]');
-  var favouriteButton = node.querySelector('button[title="Favourite"]');
+
+  var videoContainer = null;
+  var videoElem = node.querySelector('video');
+  if (videoElem) {
+    for (var elem of node.children) {
+      if (!elem.contains(videoElem)) {
+        continue;
+      }
+      videoContainer = elem;
+      videoContainer = videoContainer.cloneNode(true);
+      break;
+    }
+  }
   
+  function findBoostButton(node) {
+    var icon = node.querySelector('button.icon-button > i.fa.fa-fw.fa-retweet');
+    if (icon == null) return null;
+    return icon.parentNode;
+  }
+
+  function findFavButton(node) {
+    var icon = node.querySelector('button.icon-button > i.fa.fa-fw.fa-star');
+    if (icon == null) return null;
+    return icon.parentNode;
+  }
+  
+  var statusLink = node.querySelector('a.status__relative-time');
+  var boostButton = findBoostButton(node);
+  var favouriteButton = findFavButton(node);
+
   var pathname = statusLink.pathname;
 
   var item = new TimelineItem(node);
@@ -121,18 +148,19 @@ TimelineObserver.prototype.handleStatus = function (node) {
   item.imageAnchors = imageAnchors;
   item.hasMediaSpoiler = mediaSpoiler != null;
   item.datetime = datetime;
-	item.boostButton = boostButton;
-	item.favouriteButton = favouriteButton;
+  item.boostButton = boostButton;
+  item.favouriteButton = favouriteButton;
   item.id = pathname;
   item.numid = pathname.substr(pathname.lastIndexOf('/') + 1);
   item.link = statusLink.href;
-  
+  item.videoContainer = videoContainer;
+
   if (node.previousSibling) {
     var sibling = node.previousSibling;
     var boosted = sibling.classList.contains('status__prepend');
     item.boosted = boosted;
   }
-  
+
   function searchColumnThatContainsNode(node) {
     var node = node.parentNode;
     var body = document.body;
@@ -144,10 +172,20 @@ TimelineObserver.prototype.handleStatus = function (node) {
     return null;
   }
   
+  function isHomeColumn(column) {
+    var homeIcon = column.querySelector('.column-header > i.fa.fa-fw.fa-home');
+    return (homeIcon != null);
+  }
+  
+  function isUserColumn(column) {
+    var header = column.querySelector('.scrollable > div > div > .account__header');
+    return (header != null);
+  }
+  
   var column = searchColumnThatContainsNode(node);
   if (column) {
-    item.onHomeColumn = column.getAttribute('aria-label') === 'Home';
-    item.onUserColumn = column.querySelector('.scrollable > div > div > .account__header') != null;
+    item.onHomeColumn = isHomeColumn(column);
+    item.onUserColumn = isUserColumn(column);
   }
   
   // filtering
@@ -176,7 +214,7 @@ TimelineObserver.prototype.handleRemoval = function (node) {
 TimelineObserver.prototype.handleStatusRemoval = function (node) {
   var statusLink = node.querySelector('a.status__relative-time');
   if (statusLink == null) return;
-  
+
   var id = statusLink.pathname;
   if (this.removedSink !== null) {
     this.removedSink(id);

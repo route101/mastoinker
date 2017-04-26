@@ -2,7 +2,7 @@
 (function () { 'use strict';	
 
 function ScriptInjector() {
-	
+
 }
 
 ScriptInjector.prototype.inject = function (filename) {

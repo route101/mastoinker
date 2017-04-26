@@ -45,17 +45,17 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var content = instance.content.element;
 
   var timelineItem = proxy.item;
-  if (timelineItem.imageAnchors.length === 0) return;
+  if (timelineItem.imageAnchors.length === 0 && timelineItem.videoContainer == null) return;
 
   var itemContainer = document.createElement('div');
-	var header = document.createElement('div');
-	header.style.marginLeft = '5px';
-	header.style.display = 'flex';
-	header.style.flexDirection = 'row';
-	header.style.alignItems = 'center';
-	header.style.justifyContent = 'space-between';
-	
-	var title = document.createElement('div');
+  var header = document.createElement('div');
+  header.style.marginLeft = '5px';
+  header.style.display = 'flex';
+  header.style.flexDirection = 'row';
+  header.style.alignItems = 'center';
+  header.style.justifyContent = 'space-between';
+
+  var title = document.createElement('div');
   title.innerHTML = timelineItem.displayNameHTML;
   title.style = 'max-width: 70%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13.5px;';
   title.style.cursor = 'pointer';
@@ -70,121 +70,134 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     window.open(a.href);
   };
   header.appendChild(title);
-	
-	// toobar
-	var toolbar = document.createElement('div');
-	toolbar.style = 'margin-top: 1px; margin-bottom: 1px; overflow: visible;';
-	
-	var favButtonDiv = document.createElement('div');
-	favButtonDiv.style = 'display: inline-block; margin-right: 3px;';
-	
-	var boostButtonDiv = document.createElement('div');
-	boostButtonDiv.style = 'display: inline-block; margin-right: 18px;';
 
-	var favButton = document.createElement('button');
-	favButton.classList.add('icon-button');
-	favButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
-	
-	var boostButton = document.createElement('button');
-	boostButton.classList.add('icon-button');
-	boostButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  // toobar
+  var toolbar = document.createElement('div');
+  toolbar.style = 'margin-top: 1px; margin-bottom: 1px; overflow: visible;';
 
-	var favButtonIcon = document.createElement('i');
-	favButtonIcon.classList.add('fa', 'fa-fw', 'fa-star');
-	favButtonIcon.style.verticalAlign = 'middle';
+  var favButtonDiv = document.createElement('div');
+  favButtonDiv.style = 'display: inline-block; margin-right: 3px;';
 
-	var boostButtonIcon = document.createElement('i');
-	boostButtonIcon.classList.add('fa', 'fa-fw', 'fa-retweet');
-	boostButtonIcon.style.verticalAlign = 'middle';
+  var boostButtonDiv = document.createElement('div');
+  boostButtonDiv.style = 'display: inline-block; margin-right: 18px;';
 
-	// used when reference gets lost
-	var statusLinkDiv = document.createElement('div');
-	statusLinkDiv.style = 'display: inline-block; margin-right: 18px;';
-	var statusLinkButton = document.createElement('button');
-	statusLinkButton.classList.add('icon-button');
-	statusLinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
-	var statusLinkButtonIcon = document.createElement('i');
-	statusLinkButtonIcon.classList.add('fa', 'fa-fw', 'fa-mail-forward');
-	statusLinkButtonIcon.style.verticalAlign = 'middle';
+  var favButton = document.createElement('button');
+  favButton.classList.add('icon-button');
+  favButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
 
+  var boostButton = document.createElement('button');
+  boostButton.classList.add('icon-button');
+  boostButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
 
-	boostButton.appendChild(boostButtonIcon);
-	favButton.appendChild(favButtonIcon);
-	statusLinkButton.appendChild(statusLinkButtonIcon);
-	boostButtonDiv.appendChild(boostButton);
-	favButtonDiv.appendChild(favButton);
-	statusLinkDiv.appendChild(statusLinkButton);
-	
-	toolbar.appendChild(boostButtonDiv);
-	toolbar.appendChild(favButtonDiv);
-	
-	header.appendChild(toolbar);
-	itemContainer.appendChild(header);
+  var favButtonIcon = document.createElement('i');
+  favButtonIcon.classList.add('fa', 'fa-fw', 'fa-star');
+  favButtonIcon.style.verticalAlign = 'middle';
 
-	boostButton.onclick = function () {
-		var button = timelineItem.boostButton;
-		if (button) {
-			button.click();
-		}
-	};
-	favButton.onclick = function () {
-		var button = timelineItem.favouriteButton;
-		if (button) {
-			button.click();
-		}
-	};
-	statusLinkButton.onclick = function () {
-		var link = timelineItem.link;
-		if (link) {
-			window.open(link);
-		}
-	};
-	
-	function updateButton(active, star) {
-		if (active) {
-			this.classList.add('active');
-			if (star) this.style.color = 'rgb(202, 143, 4)';
-		}
-		else {
-			this.classList.remove('active');
-			if (star) this.style.removeProperty('color');
-		}
-	}
-	
-	function observe(target, button, star) {
-		function callback(mutations) {
-			mutations.forEach(function (mutation) {
-				if (mutation.type !== 'attributes') return;
-				var active = target.classList.contains('active');
-				updateButton.call(button, active, star);
-			});
-		}
-		var observer = new MutationObserver(callback);
-		observer.observe(target, { attributes: true });
-		return observer;
-	}
+  var boostButtonIcon = document.createElement('i');
+  boostButtonIcon.classList.add('fa', 'fa-fw', 'fa-retweet');
+  boostButtonIcon.style.verticalAlign = 'middle';
 
-	if (timelineItem.boostButton) {
-		updateButton.call(boostButton, 
-			timelineItem.boostButton.classList.contains('active'), false);
-		var ob = observe(timelineItem.boostButton, boostButton, false);
-		itemContainer.$oinker$boost$observer = ob; // HAX
-	}
+  // used when reference gets lost
+  var statusLinkDiv = document.createElement('div');
+  statusLinkDiv.style = 'display: inline-block; margin-right: 18px;';
+  var statusLinkButton = document.createElement('button');
+  statusLinkButton.classList.add('icon-button');
+  statusLinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  var statusLinkButtonIcon = document.createElement('i');
+  statusLinkButtonIcon.classList.add('fa', 'fa-fw', 'fa-mail-forward');
+  statusLinkButtonIcon.style.verticalAlign = 'middle';
 
-	if (timelineItem.favouriteButton) {
-		updateButton.call(favButton, 
-			timelineItem.favouriteButton.classList.contains('active'), true);
-		var ob = observe(timelineItem.favouriteButton, favButton, true);
-		itemContainer.$oinker$fav$observer = ob; // HAX
-	}
+  boostButton.appendChild(boostButtonIcon);
+  favButton.appendChild(favButtonIcon);
+  statusLinkButton.appendChild(statusLinkButtonIcon);
+  boostButtonDiv.appendChild(boostButton);
+  favButtonDiv.appendChild(favButton);
+  statusLinkDiv.appendChild(statusLinkButton);
 
-	// images
+  toolbar.appendChild(boostButtonDiv);
+  toolbar.appendChild(favButtonDiv);
+
+  header.appendChild(toolbar);
+  itemContainer.appendChild(header);
+
+  boostButton.onclick = function () {
+    var button = timelineItem.boostButton;
+    if (button) {
+      button.click();
+    }
+  };
+  favButton.onclick = function () {
+    var button = timelineItem.favouriteButton;
+    if (button) {
+      button.click();
+    }
+  };
+  statusLinkButton.onclick = function () {
+    var link = timelineItem.link;
+    if (link) {
+      window.open(link);
+    }
+  };
+
+  function updateButton(active, star) {
+    if (active) {
+      this.classList.add('active');
+      if (star) this.style.color = 'rgb(202, 143, 4)';
+    }
+    else {
+      this.classList.remove('active');
+      if (star) this.style.removeProperty('color');
+    }
+  }
+
+  function observe(target, button, star) {
+    function callback(mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.type !== 'attributes') return;
+        var active = target.classList.contains('active');
+        updateButton.call(button, active, star);
+      });
+    }
+    var observer = new MutationObserver(callback);
+    observer.observe(target, { attributes: true });
+    return observer;
+  }
+
+  if (timelineItem.boostButton) {
+    updateButton.call(boostButton, 
+      timelineItem.boostButton.classList.contains('active'), false);
+    var ob = observe(timelineItem.boostButton, boostButton, false);
+    itemContainer.$oinker$boost$observer = ob; // HAX
+  }
+
+  if (timelineItem.favouriteButton) {
+    updateButton.call(favButton, 
+      timelineItem.favouriteButton.classList.contains('active'), true);
+    var ob = observe(timelineItem.favouriteButton, favButton, true);
+    itemContainer.$oinker$fav$observer = ob; // HAX
+  }
+
+  var animated = false;
+
+  // images
   var loader = new ImageLazyLoader();
+
+  if (animated) {
+    loader.imageLoaded = function (image) {
+      var animation = image.animate([{'opacity': 0, 'easing': 'ease-in'}, {'opacity': 1}], 120);
+      animation.onfinish = function () {
+        image.style.opacity = '1';
+      };
+    };
+  }
 
   timelineItem.imageAnchors.forEach(function (imageAnchor) {
     var image = document.createElement('img');
     image.style.width = '100%';
     image.style.cursor = 'pointer';
+    if (animated) {
+      image.style.opacity = '0';
+    }
     image.onclick = function () {
       imageAnchor.click();
     };
@@ -197,61 +210,65 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     loader.sink = completionHandler;
     loader.start();
   };
-	
-	itemContainer.dataset.statusId = timelineItem.id;
-	itemContainer.$referenceLost = function () {
-		toolbar.removeChild(boostButtonDiv);
-		toolbar.removeChild(favButtonDiv);
-		toolbar.appendChild(statusLinkDiv);
-	};
-	
+
+  itemContainer.dataset.statusId = timelineItem.id;
+  itemContainer.$referenceLost = function () {
+    toolbar.removeChild(boostButtonDiv);
+    toolbar.removeChild(favButtonDiv);
+    toolbar.appendChild(statusLinkDiv);
+  };
+
+  if (timelineItem.videoContainer) {
+    itemContainer.appendChild(timelineItem.videoContainer);
+  }
+
   content.insertBefore(itemContainer, content.firstChild);
   var ROTATION = 100;
   if (content.children.length > ROTATION) {
     var last = content.lastChild;
-		
-		if (last.$oinker$boost$observer) {
-			last.$oinker$boost$observer.disconnect();
-		}
-		if (last.$oinker$fav$observer) {
-			last.$oinker$fav$observer.disconnect();
-		}
-		
+
+    if (last.$oinker$boost$observer) {
+      last.$oinker$boost$observer.disconnect();
+    }
+    if (last.$oinker$fav$observer) {
+      last.$oinker$fav$observer.disconnect();
+    }
+
     content.removeChild(last);
   }
 };
 
 ImageViewColumn.prototype.remove = function (id) {
-	var found = [];
-	var content = this.content.element;
-	for (var element of content.children) {
-		if (element.dataset.statusId === id) {
-			found.push(element);
-		}
-	}
+  var found = [];
+  var content = this.content.element;
+  for (var element of content.children) {
+    if (element.dataset.statusId === id) {
+      found.push(element);
+    }
+  }
 
-	for (var element of found) {
-		if (element.$oinker$boost$observer) {
-			element.$oinker$boost$observer.disconnect();
-			element.$oinker$boost$observer = null;
-		}
-		if (element.$oinker$fav$observer) {
-			element.$oinker$fav$observer.disconnect();
-			element.$oinker$fav$observer = null;
-		}
-		if (element.$referenceLost) {
-			element.$referenceLost.call(null);
-			element.$referenceLost = null;
-		}
-	}
-	
-	if (this.context.getConfig('preserve', true)) {
-		return;
-	} 
-	
-	for (var element of found) {
-		content.removeChild(element);
-	}
+  for (var element of found) {
+    if (element.$oinker$boost$observer) {
+      element.$oinker$boost$observer.disconnect();
+      element.$oinker$boost$observer = null;
+    }
+    if (element.$oinker$fav$observer) {
+      element.$oinker$fav$observer.disconnect();
+      element.$oinker$fav$observer = null;
+    }
+    if (element.$referenceLost) {
+      element.$referenceLost.call(null);
+      element.$referenceLost = null;
+    }
+  }
+
+  if (this.context.getConfig('preserve', true)) {
+    return;
+  } 
+
+  for (var element of found) {
+    content.removeChild(element);
+  }
 };
 
 this.ImageViewColumn = ImageViewColumn;
