@@ -121,6 +121,7 @@ function ImageViewColumnControl(container, context) {
   
   var preferSpeed = new ControlItem('preferspeed', 
     chrome.i18n.getMessage('settingPreferSpeed'), shouldPreferSpeed);
+  preferSpeed.delegate = new ItemDelegate();
 
   var oink = new ControlItem('oinks', chrome.i18n.getMessage('settingOinks'), shouldOink);
   oink.delegate = new ItemDelegate();
