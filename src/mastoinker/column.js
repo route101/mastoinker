@@ -265,13 +265,14 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
 
   itemContainer.dataset.statusId = timelineItem.id;
   itemContainer.$referenceLost = function () {
-    toolbar.removeChild(downloadButton);
-    toolbar.removeChild(oinkButton);
-    toolbar.removeChild(boostButtonDiv);
-    toolbar.removeChild(favButtonDiv);
+    var child = toolbar.firstChild;
+    while (child != null) {
+      toolbar.removeChild(child);
+      child = toolbar.firstChild;
+    }
     
-    toolbar.appendChild(downloadButton);
     toolbar.appendChild(statusLinkDiv);
+    toolbar.appendChild(downloadButton);
   };
   
   /* comment out until the performance issue gets solved
