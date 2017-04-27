@@ -100,7 +100,8 @@ function ImageViewColumnControl(container, context) {
   var shouldPreserve = context.getConfig('preserve', true);
   var shouldOink = context.getConfig('oinks', false);
   var shouldOinkBoost = context.getConfig('oinkboost', false);
-
+  var shouldPreferSpeed = context.getConfig('preferspeed', true);
+  
   var nsfw = new ControlItem('nsfw', chrome.i18n.getMessage('settingNSFW'), shouldDisplayNSFW);
   nsfw.delegate = new ItemDelegate();
 
@@ -118,6 +119,9 @@ function ImageViewColumnControl(container, context) {
   
   var descPreserve = new DescriptionItem(chrome.i18n.getMessage('descSettingPreserve'));
   
+  var preferSpeed = new ControlItem('preferspeed', 
+    chrome.i18n.getMessage('settingPreferSpeed'), shouldPreferSpeed);
+
   var oink = new ControlItem('oinks', chrome.i18n.getMessage('settingOinks'), shouldOink);
   oink.delegate = new ItemDelegate();
 
@@ -127,7 +131,7 @@ function ImageViewColumnControl(container, context) {
   var descOink = new DescriptionItem(chrome.i18n.getMessage('descSettingOink'));
   
   // skipping descPreserve because it's not so informative
-  this.items = [nsfw, boost, home, user, preserve, oink, oinkBoost, descOink];
+  this.items = [nsfw, boost, home, user, preserve, preferSpeed, oink, oinkBoost, descOink];
 }
 
 ImageViewColumnControl.prototype.inject = function () {

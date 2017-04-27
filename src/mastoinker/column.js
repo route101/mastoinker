@@ -242,7 +242,7 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
       };
     };
   }
-
+  
   timelineItem.imageAnchors.forEach(function (imageAnchor) {
     var image = document.createElement('img');
     image.style.width = '100%';
@@ -253,8 +253,22 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     image.onclick = function () {
       imageAnchor.click();
     };
-
-    loader.register(image, imageAnchor.href);
+    
+    function thumbnaiImageUri(img) {
+      if (instance.context.getConfig('preferspeed', true)) {
+        var pathname = img.pathname;
+        var components = pathname.split('/');
+        if (components.length === 8) {
+          components[6] = 'small';
+          pathname = components.join('/');
+          var url = new URL(pathname, img.href);
+          return url.href;
+        }
+      }
+      return img.href;
+    }
+    
+    loader.register(image, thumbnaiImageUri(imageAnchor));
     itemContainer.appendChild(image);
   });
 

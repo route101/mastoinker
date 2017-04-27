@@ -31,5 +31,8 @@
   },
   "descSettingOink": {
     "message": "\"Oink!\" button is useful when you want to do both download and favourite."
+  },
+  "settingPreferSpeed": {
+    "message": "Prefer loading speed to image quality"
   }
 }

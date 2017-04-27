@@ -31,6 +31,9 @@
   },
   "descSettingOink": {
     "message": "「Oink!」ボタンはお気に入りとダウンロードを同時にできるボタンです"
+  },
+  "settingPreferSpeed": {
+    "message": "画質より読込速度を優先する"
   }
 }
 
