@@ -6,7 +6,7 @@
     "message": "マストドンのタイムラインに流れる画像を見やすくします"
   },
   "settingPreserve": {
-    "message": "表示した画像を保持"
+    "message": "タイムライン移動時に画像を保持"
   },
   "settingNSFW": {
     "message": "ＮＳＦＷ画像を表示"
@@ -22,6 +22,15 @@
   },
   "descSettingPreserve": {
     "message": "「表示した画像を保持」オプションを有効にすると最近表示した１００件までの画像を保持できます"
+  },
+  "settingOinks": {
+    "message": "「Oink!」ボタンを表示"
+  },
+  "settingOinkBoost": {
+    "message": "「Oink!」ボタンでブーストする"
+  },
+  "descSettingOink": {
+    "message": "「Oink!」ボタンはお気に入りとダウンロードを同時にできるボタンです"
   }
 }
 

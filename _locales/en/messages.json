@@ -22,5 +22,14 @@
   },
   "descSettingPreserve": {
     "message": "`Preserve statuses shown` option can be used to keep track of 100 images shown so far. But it also disables Boost and Favourite buttons."
+  },
+  "settingOinks": {
+    "message": "Oink button"
+  },
+  "settingOinkBoost": {
+    "message": "Boost when oinks"
+  },
+  "descSettingOink": {
+    "message": "Oink buttons are something."
   }
 }

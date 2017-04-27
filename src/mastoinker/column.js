@@ -57,7 +57,7 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
 
   var title = document.createElement('div');
   title.innerHTML = timelineItem.displayNameHTML;
-  title.style = 'max-width: 70%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13.5px;';
+  title.style = 'max-width: 65%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13.5px;';
   title.style.cursor = 'pointer';
   title.onmouseover = function () {
     this.style['text-decoration'] = 'underline';
@@ -72,14 +72,16 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   header.appendChild(title);
 
   // toobar
+  // ideal button margin-right: 18px, title max-width: 70%
+
   var toolbar = document.createElement('div');
   toolbar.style = 'margin-top: 1px; margin-bottom: 1px; overflow: visible;';
 
   var favButtonDiv = document.createElement('div');
-  favButtonDiv.style = 'display: inline-block; margin-right: 3px;';
-
+  favButtonDiv.style = 'display: inline-block; margin-right: 12px;';
+  
   var boostButtonDiv = document.createElement('div');
-  boostButtonDiv.style = 'display: inline-block; margin-right: 18px;';
+  boostButtonDiv.style = 'display: inline-block; margin-right: 12px;';
 
   var favButton = document.createElement('button');
   favButton.classList.add('icon-button');
@@ -99,23 +101,54 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
 
   // used when reference gets lost
   var statusLinkDiv = document.createElement('div');
-  statusLinkDiv.style = 'display: inline-block; margin-right: 18px;';
+  statusLinkDiv.style = 'display: inline-block; margin-right: 12px;';
   var statusLinkButton = document.createElement('button');
   statusLinkButton.classList.add('icon-button');
   statusLinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
   var statusLinkButtonIcon = document.createElement('i');
   statusLinkButtonIcon.classList.add('fa', 'fa-fw', 'fa-mail-forward');
   statusLinkButtonIcon.style.verticalAlign = 'middle';
+  
+  // download button
+  var downloadDiv = document.createElement('div');
+  downloadDiv.style = 'display: inline-block; margin-right: 3px;';
+  var downloadButton = document.createElement('button');
+  downloadButton.classList.add('icon-button');
+  downloadButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  var downloadButtonIcon = document.createElement('i');
+  downloadButtonIcon.classList.add('fa', 'fa-fw', 'fa-download');
+  downloadButtonIcon.style.verticalAlign = 'middle';
+
+  // oink button
+  var oinkDiv = document.createElement('div');
+  oinkDiv.style = 'display: inline-block; margin-right: 3px;';
+  var oinkButton = document.createElement('button');
+  oinkButton.classList.add('icon-button', 'oink-button');
+  oinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  var oinkButtonIcon = document.createElement('i');
+  oinkButtonIcon.classList.add('fa', 'fa-fw', 'fa-heart');
+  oinkButtonIcon.style.verticalAlign = 'middle';
 
   boostButton.appendChild(boostButtonIcon);
   favButton.appendChild(favButtonIcon);
   statusLinkButton.appendChild(statusLinkButtonIcon);
+  downloadButton.appendChild(downloadButtonIcon);
+  oinkButton.appendChild(oinkButtonIcon);
+  
   boostButtonDiv.appendChild(boostButton);
   favButtonDiv.appendChild(favButton);
   statusLinkDiv.appendChild(statusLinkButton);
-
+  downloadDiv.appendChild(downloadButton);
+  oinkDiv.appendChild(oinkButton);
+    
   toolbar.appendChild(boostButtonDiv);
   toolbar.appendChild(favButtonDiv);
+  if (this.context.getConfig('oinks', false)) {
+    toolbar.appendChild(oinkDiv);
+  }
+  else {
+    toolbar.appendChild(downloadDiv);
+  }
 
   header.appendChild(toolbar);
   itemContainer.appendChild(header);
@@ -138,7 +171,26 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
       window.open(link);
     }
   };
-
+  downloadButton.onclick = function () {
+    timelineItem.downloadImages();
+  };
+  
+  oinkButton.onclick = function () {
+    var favButton = timelineItem.favouriteButton;
+    if (!favButton.classList.contains('active')) {
+      favButton.click();
+    }
+    
+    if (instance.context.getConfig('oinkboost', false)) {
+      var boostButton = timelineItem.boostButton;
+      if (!boostButton.classList.contains('active')) {
+        boostButton.click();
+      }
+    }
+    
+    timelineItem.downloadImages();
+  };
+  
   function updateButton(active, star) {
     if (active) {
       this.classList.add('active');
@@ -213,15 +265,21 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
 
   itemContainer.dataset.statusId = timelineItem.id;
   itemContainer.$referenceLost = function () {
+    toolbar.removeChild(downloadButton);
+    toolbar.removeChild(oinkButton);
     toolbar.removeChild(boostButtonDiv);
     toolbar.removeChild(favButtonDiv);
+    
+    toolbar.appendChild(downloadButton);
     toolbar.appendChild(statusLinkDiv);
   };
-
+  
+  /* comment out until the performance issue gets solved
   if (timelineItem.videoContainer) {
     itemContainer.appendChild(timelineItem.videoContainer);
   }
-
+  */
+  
   content.insertBefore(itemContainer, content.firstChild);
   var ROTATION = 100;
   if (content.children.length > ROTATION) {

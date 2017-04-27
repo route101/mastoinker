@@ -19,6 +19,9 @@ CssRuleInjector.prototype.injectColumnCollapseRule = function () {
   this.inject('.columns-area > div:nth-child(2):nth-last-child(1)', 'display: none !important;');
 }
 
+CssRuleInjector.prototype.injectOinkButtonRule = function () {
+  this.inject('.oink-button:hover', 'color: rgb(202, 3, 46);');
+};
 
 this.CssRuleInjector = CssRuleInjector;
 

@@ -22,6 +22,31 @@ function TimelineItem(node) {
   this.videoContainer = null;
 }
 
+TimelineItem.prototype.downloadImages = function () {
+  var counter = 0;
+  var items = [];
+  var dir = window.location.host;
+  if (dir == null || dir == '') return;
+  dir = 'oinker_' + dir;
+  
+  for (var anchor of this.imageAnchors) {
+    counter += 1;
+    var imageUri = anchor.href;
+    var ext = anchor.pathname.split('.').pop();
+    var name = this.name.split('@').pop();
+    var item = {url: imageUri, 
+      filename: dir + '/' + 'i' + this.numid + '_n' + counter + '_' + name + '.' + ext};
+    items.push(item);
+  }
+  var message = {
+    type: 'download',
+    data: {
+      items: items
+    }
+  };
+  chrome.runtime.sendMessage(message);
+};
+
 function TimelineObserver(element, context) {
   this.element = element;
   this.context = context;
@@ -109,6 +134,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
     }
   });
 
+  /* comment out until the performance issue gets solved
   var videoContainer = null;
   var videoElem = node.querySelector('video');
   if (videoElem) {
@@ -121,6 +147,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
       break;
     }
   }
+  */
   
   function findBoostButton(node) {
     var icon = node.querySelector('button.icon-button > i.fa.fa-fw.fa-retweet');
@@ -153,7 +180,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
   item.id = pathname;
   item.numid = pathname.substr(pathname.lastIndexOf('/') + 1);
   item.link = statusLink.href;
-  item.videoContainer = videoContainer;
+  /* item.videoContainer = videoContainer; */
 
   if (node.previousSibling) {
     var sibling = node.previousSibling;

@@ -30,6 +30,7 @@ Mastoinker.prototype.init = function () {
 
   this.cssRuleInjector = new CssRuleInjector();
   this.cssRuleInjector.injectColumnCollapseRule();
+  this.cssRuleInjector.injectOinkButtonRule();
   
   this.loadDispatcher = dispatcher;
 

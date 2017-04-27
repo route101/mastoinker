@@ -25,10 +25,14 @@
     "webNavigation",
     "<all_urls>"
   ],
-
+  
   "web_accessible_resources": [
     
   ],
+
+  "background": {
+    "scripts": ["src/background.js"]
+  },
 
   "content_scripts": [
     {
