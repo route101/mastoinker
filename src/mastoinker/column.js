@@ -66,8 +66,8 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     this.style['text-decoration'] = 'none';
   };
   title.onclick = function () {
-    var a = timelineItem.nameElement;
-    window.open(a.href);
+    var author = timelineItem.author;
+    window.open("/@" + author);
   };
   header.appendChild(title);
 

@@ -6,7 +6,6 @@ function TimelineItem(node) {
   this.node = node; // preserve reference
   this.id = null;
   this.name = null;
-  this.nameElement = null;
   this.displayNameHTML = null;
   this.displayNameText = null;
   this.imageAnchors = null;
@@ -20,6 +19,7 @@ function TimelineItem(node) {
   this.link = null;
   this.numid = null;
   this.videoContainer = null;
+  this.author = null;
 }
 
 TimelineItem.prototype.downloadImages = function () {
@@ -33,7 +33,10 @@ TimelineItem.prototype.downloadImages = function () {
     counter += 1;
     var imageUri = anchor.href;
     var ext = anchor.pathname.split('.').pop();
-    var name = this.name.split('@').pop();
+    var name = this.author;
+    if (ext === 'php') {
+      ext = 'png'; // HAX
+    }
     var item = {url: imageUri, 
       filename: dir + '/' + 'i' + this.numid + '_n' + counter + '_' + name + '.' + ext};
     items.push(item);
@@ -166,10 +169,12 @@ TimelineObserver.prototype.handleStatus = function (node) {
   var favouriteButton = findFavButton(node);
 
   var pathname = statusLink.pathname;
-
+  var pathnameComponents = pathname.split('/');
+  if (pathnameComponents < 3) return;
+  
   var item = new TimelineItem(node);
   item.name = name;
-  item.nameElement = nameElem;
+  item.author = pathnameComponents[1].substring(1);
   item.displayNameHTML = displayNameHTML;
   item.displayNameText = displayNameText;
   item.imageAnchors = imageAnchors;

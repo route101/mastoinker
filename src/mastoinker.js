@@ -14,8 +14,11 @@ Mastoinker.prototype.init = function () {
   var instance = this;
   var columnsArea = document.querySelector('.columns-area');
   if (columnsArea == null) return;
-
-  var imageView = new ImageViewColumn(columnsArea, this.context);
+  
+  var columnContainer = columnsArea;
+  if (columnContainer == null) return;
+  
+  var imageView = new ImageViewColumn(columnContainer, this.context);
 
   var dispatcher = new LoadDispatcher()
   dispatcher.sink = imageView.insert.bind(imageView);
@@ -31,6 +34,7 @@ Mastoinker.prototype.init = function () {
   this.cssRuleInjector = new CssRuleInjector();
   this.cssRuleInjector.injectColumnCollapseRule();
   this.cssRuleInjector.injectOinkButtonRule();
+  this.cssRuleInjector.injectColumnFixPosition();
   
   this.loadDispatcher = dispatcher;
 

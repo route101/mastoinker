@@ -23,6 +23,10 @@ CssRuleInjector.prototype.injectOinkButtonRule = function () {
   this.inject('.oink-button:hover', 'color: rgb(202, 3, 46);');
 };
 
+CssRuleInjector.prototype.injectColumnFixPosition = function () {
+  this.inject('.mastodon-column-container', 'display: flex; flex: none; width: auto;');
+};
+
 this.CssRuleInjector = CssRuleInjector;
 
 }).call(this);
