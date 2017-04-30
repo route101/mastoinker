@@ -16,6 +16,17 @@ Mastoinker.prototype.init = function () {
   if (columnsArea == null) return;
   
   var columnContainer = columnsArea;
+  
+  // WORKAROUND: column layout fix
+  if (columnsArea.children.length > 1) {
+    var wrapper = columnsArea.lastChild;
+    wrapper.style.flex = 'none';
+  }
+  else {
+    var wrapper = columnsArea.firstChild;
+    wrapper.style.flex = 'none';
+  }
+  
   if (columnContainer == null) return;
   
   var imageView = new ImageViewColumn(columnContainer, this.context);
