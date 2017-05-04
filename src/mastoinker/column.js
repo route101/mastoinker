@@ -65,7 +65,6 @@ ImageViewColumn.prototype.inject = function () {
 };
 
 ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
-  
   if (!this.active) return;
 
   var instance = this;

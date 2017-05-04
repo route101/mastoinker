@@ -133,7 +133,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
   var imageAnchors = [];
   var anchors = node.querySelectorAll('a');
   anchors.forEach(function (item) {
-    if (item.style.background && item.style.background !== "") {
+    if (item.style.backgroundImage && item.style.backgroundImage !== "") {
       imageAnchors.push(item);
     }
   });
