@@ -80,7 +80,8 @@ DescriptionItem.prototype.insert = function (container) {
 
 function ImageViewColumnControl(container, context) {
   this.container = container;
-
+  this.activatedSink = null;
+  
   function ItemDelegate() { }
   ItemDelegate.prototype.changed = function (item, value) {
     context.putConfig(item.id, value, function () {
@@ -136,10 +137,12 @@ function ImageViewColumnControl(container, context) {
 }
 
 ImageViewColumnControl.prototype.inject = function () {
+  var instance = this;
   var control = document.createElement('div');
   control.style.position = 'relative';
 
   var settingsButton = document.createElement('div');
+  settingsButton.title = chrome.i18n.getMessage('titleSettingButton');
   settingsButton.classList.add('column-icon',  'collapsable-collapsed')
   settingsButton.style = 'font-size: 16px; padding: 15px; position: absolute; right: 0px; top: -48px; cursor: pointer; z-index: 3;';
   control.appendChild(settingsButton);
@@ -155,6 +158,7 @@ ImageViewColumnControl.prototype.inject = function () {
   var settingsOuter = document.createElement('div');
   settingsOuter.classList.add('column-settings--outer');
   settingsOuter.style = 'padding: 15px;';
+  settingsOuter.style.background = '#393f4f';
   settingsOverlay.appendChild(settingsOuter);
 
   for (var item of this.items) {
@@ -175,8 +179,33 @@ ImageViewColumnControl.prototype.inject = function () {
       settingsOverlay.style.opacity = '0';
     }
   };
-
+  
   this.container.appendChild(control);
+
+  // 
+  var activateButton = document.createElement('div');
+  activateButton.title = chrome.i18n.getMessage('titleActivateButton');
+  activateButton.classList.add('column-icon', 'column-icon-clear');
+  var activateButtonIcon = document.createElement('i');
+  activateButtonIcon.classList.add('fa', 'fa-toggle-on');
+  activateButton.appendChild(activateButtonIcon);
+  this.container.appendChild(activateButton);
+
+  activateButton.onclick = function () {
+    var isOn = false;
+    if (activateButtonIcon.classList.contains('fa-toggle-off')) {
+      isOn = true;
+    }
+    
+    activateButtonIcon.classList.toggle('fa-toggle-off');
+    activateButtonIcon.classList.toggle('fa-toggle-on');
+    
+    var sink = instance.activatedSink;
+    if (sink) {
+      sink(isOn);
+    }
+  };
+
 };
 
 

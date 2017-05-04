@@ -34,5 +34,29 @@
   },
   "settingPreferSpeed": {
     "message": "Prefer loading speed to image quality"
+  },
+  "deactivated": {
+    "message": "Image loading deactivated"
+  },
+  "titleActivateButton": {
+    "message": "Image Load Toggle"
+  },
+  "titleSettingButton": {
+    "message": "Option Settings"
+  },
+  "titleBoostButton": {
+    "message": "Boost"
+  },
+  "titleFavButton": {
+    "message": "Favourite"
+  },
+  "titleDownloadButton": {
+    "message": "Download"
+  },
+  "titleOinkButton": {
+    "message": "Oink!"
+  },
+  "titleStatusButton": {
+    "message": "Status"
   }
 }

@@ -34,6 +34,30 @@
   },
   "settingPreferSpeed": {
     "message": "画質より読込速度を優先する"
+  },
+  "deactivated": {
+    "message": "読み込みは無効化されています"
+  },
+  "titleActivateButton": {
+    "message": "画像読込のOn/Off"
+  },
+  "titleSettingButton": {
+    "message": "オプション設定"
+  },
+  "titleBoostButton": {
+    "message": "ブースト"
+  },
+  "titleFavButton": {
+    "message": "お気に入り"
+  },
+  "titleDownloadButton": {
+    "message": "ダウンロード"
+  },
+  "titleOinkButton": {
+    "message": "Ｏｉｎｋ！"
+  },
+  "titleStatusButton": {
+    "message": "ステータスページに移動"
   }
 }
 

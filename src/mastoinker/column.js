@@ -7,9 +7,12 @@ function ImageViewColumn(container, context) {
   this.header = null;
   this.control = null;
   this.content = null;
+  this.active = true;
+  this.latestStatusID = null;
 }
 
 ImageViewColumn.prototype.inject = function () {
+  var instance = this;
   var column = document.createElement('div');
   column.role = 'section';
   column.classList.add('column');
@@ -17,7 +20,7 @@ ImageViewColumn.prototype.inject = function () {
   var header = new ImageViewColumnHeader(column);
   var control = new ImageViewColumnControl(column, this.context);
   var content = new ImageViewColumnContent(column);
-
+  
   header.inject();
   control.inject();
   content.inject();
@@ -34,6 +37,27 @@ ImageViewColumn.prototype.inject = function () {
   };
   control.delegate = new ControlDelegate();
 
+  // activation button handle
+  var deactivatedStatusDiv = document.createElement('div');
+  deactivatedStatusDiv.innerText = chrome.i18n.getMessage('deactivated');
+  deactivatedStatusDiv.style.textAlign = 'center';
+  deactivatedStatusDiv.style.padding = '10px';
+  control.activatedSink = function (activated) {
+    instance.active = activated;
+    
+    var content = instance.content.element;
+    if (activated) {
+      if (content.contains(deactivatedStatusDiv)) {
+        content.removeChild(deactivatedStatusDiv);
+      }
+    }
+    else {
+      if (!content.contains(deactivatedStatusDiv)) {
+        content.insertBefore(deactivatedStatusDiv, content.firstChild);
+      }
+    }
+  };
+  
   this.header = header;
   this.control = control;
   this.content = content;
@@ -41,12 +65,21 @@ ImageViewColumn.prototype.inject = function () {
 };
 
 ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
+  
+  if (!this.active) return;
+
   var instance = this;
   var content = instance.content.element;
 
   var timelineItem = proxy.item;
   if (timelineItem.imageAnchors.length === 0 && timelineItem.videoContainer == null) return;
 
+  if (this.latestStatusID && timelineItem.id === this.latestStatusID) {
+    // duplicated
+    return;
+  }
+  this.latestStatusID = timelineItem.id;
+  
   var itemContainer = document.createElement('div');
   var header = document.createElement('div');
   header.style.marginLeft = '5px';
@@ -66,8 +99,8 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
     this.style['text-decoration'] = 'none';
   };
   title.onclick = function () {
-    var author = timelineItem.author;
-    window.open("/@" + author);
+    var authorURL = timelineItem.authorURL;
+    window.open(authorURL.href);
   };
   header.appendChild(title);
 
@@ -86,10 +119,12 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var favButton = document.createElement('button');
   favButton.classList.add('icon-button');
   favButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  favButton.title = chrome.i18n.getMessage('titleFavButton');
 
   var boostButton = document.createElement('button');
   boostButton.classList.add('icon-button');
   boostButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
+  boostButton.title = chrome.i18n.getMessage('titleBoostButton');
 
   var favButtonIcon = document.createElement('i');
   favButtonIcon.classList.add('fa', 'fa-fw', 'fa-star');
@@ -103,6 +138,7 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var statusLinkDiv = document.createElement('div');
   statusLinkDiv.style = 'display: inline-block; margin-right: 12px;';
   var statusLinkButton = document.createElement('button');
+  statusLinkButton.title = chrome.i18n.getMessage('titleStatusButton');
   statusLinkButton.classList.add('icon-button');
   statusLinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
   var statusLinkButtonIcon = document.createElement('i');
@@ -113,6 +149,7 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var downloadDiv = document.createElement('div');
   downloadDiv.style = 'display: inline-block; margin-right: 3px;';
   var downloadButton = document.createElement('button');
+  downloadButton.title = chrome.i18n.getMessage('titleDownloadButton');
   downloadButton.classList.add('icon-button');
   downloadButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
   var downloadButtonIcon = document.createElement('i');
@@ -123,6 +160,7 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
   var oinkDiv = document.createElement('div');
   oinkDiv.style = 'display: inline-block; margin-right: 3px;';
   var oinkButton = document.createElement('button');
+  oinkButton.title = chrome.i18n.getMessage('titleOinkButton');
   oinkButton.classList.add('icon-button', 'oink-button');
   oinkButton.style = 'font-size: 18px; width: 23.1429px; height: 23.1429px; line-height: 18px;';
   var oinkButtonIcon = document.createElement('i');

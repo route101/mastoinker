@@ -20,6 +20,7 @@ function TimelineItem(node) {
   this.numid = null;
   this.videoContainer = null;
   this.author = null;
+  this.authorURL = null;
 }
 
 TimelineItem.prototype.downloadImages = function () {
@@ -170,11 +171,24 @@ TimelineObserver.prototype.handleStatus = function (node) {
 
   var pathname = statusLink.pathname;
   var pathnameComponents = pathname.split('/');
-  if (pathnameComponents < 3) return;
+  if (pathnameComponents.length < 3) return;
   
+  function findAuthorID() {
+    var fst = pathnameComponents[1];
+    if (fst.substring(0, 1) === '@') {
+      return fst.substring(1);
+    }
+    else if (fst === 'users') {
+      return pathnameComponents[2];
+    }
+    return "";
+  }
+  
+  var author = findAuthorID();
+
   var item = new TimelineItem(node);
   item.name = name;
-  item.author = pathnameComponents[1].substring(1);
+  item.author = author;
   item.displayNameHTML = displayNameHTML;
   item.displayNameText = displayNameText;
   item.imageAnchors = imageAnchors;
@@ -185,6 +199,8 @@ TimelineObserver.prototype.handleStatus = function (node) {
   item.id = pathname;
   item.numid = pathname.substr(pathname.lastIndexOf('/') + 1);
   item.link = statusLink.href;
+  item.authorURL = new URL("/@" + author, statusLink.href);
+  
   /* item.videoContainer = videoContainer; */
 
   if (node.previousSibling) {
