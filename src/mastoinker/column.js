@@ -291,15 +291,30 @@ ImageViewColumn.prototype.insert = function (/* LoadProxy */ proxy) {
       imageAnchor.click();
     };
     
+    function isValidURL(url) {
+      try {
+        var uri = new URL(url);
+        return (!!uri);
+      }
+      catch (e) {
+        return false;
+      }
+    }
+    
+    function extractBackgroundImageURL(img) {
+      if (img.style == null) return null;
+      var bg = img.style.backgroundImage;
+      if (bg == '') return null;
+      var bgURL = bg.slice(4, -1).replace(/"/g, '');
+      if (!isValidURL(bgURL)) return null;
+      return bgURL;
+    }
+    
     function thumbnaiImageUri(img) {
       if (instance.context.getConfig('preferspeed', true)) {
-        var pathname = img.pathname;
-        var components = pathname.split('/');
-        if (components.length === 8) {
-          components[6] = 'small';
-          pathname = components.join('/');
-          var url = new URL(pathname, img.href);
-          return url.href;
+        var extractedURL = extractBackgroundImageURL(img);
+        if (extractedURL) {
+          return extractedURL;
         }
       }
       return img.href;
