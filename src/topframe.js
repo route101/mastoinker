@@ -4,7 +4,7 @@
 function underlyingMastodon() {
   var reactAppHolder = document.querySelector('body.app-body > .app-holder');
   if (reactAppHolder == null) return false;
-  return reactAppHolder.dataset.reactClass === 'Mastodon';
+  return (reactAppHolder.dataset.reactClass === 'Mastodon' || reactAppHolder.id === 'mastodon');
 }
 
 if (!underlyingMastodon()) return;
