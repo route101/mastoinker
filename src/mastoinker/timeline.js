@@ -131,9 +131,9 @@ TimelineObserver.prototype.handleStatus = function (node) {
   }
 
   var imageAnchors = [];
-  var anchors = node.querySelectorAll('a');
+  var anchors = node.querySelectorAll('.media-gallery a');
   anchors.forEach(function (item) {
-    if (item.style.backgroundImage && item.style.backgroundImage !== "") {
+    if (item.querySelector('img')) {
       imageAnchors.push(item);
     }
   });
@@ -165,7 +165,7 @@ TimelineObserver.prototype.handleStatus = function (node) {
     return icon.parentNode;
   }
   
-  var statusLink = node.querySelector('a.status__relative-time');
+  var statusLink = node.querySelector('a.status__time');
   var boostButton = findBoostButton(node);
   var favouriteButton = findFavButton(node);
 
@@ -240,7 +240,6 @@ TimelineObserver.prototype.handleStatus = function (node) {
   if (!this.context.getConfig('listboost', true) && item.boosted) return;
   if (!this.context.getConfig('listhome', true) && item.onHomeColumn) return;
   if (!this.context.getConfig('listuser', true) && item.onUserColumn) return;
-
   if (this.sink !== null) {
     this.sink(item);
   }
